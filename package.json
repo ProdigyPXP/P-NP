@@ -10,14 +10,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ProdigyPNP/P-NP.git"
+		"url": "git+https://github.com/ProdigyPXP/P-NP.git"
 	},
-	"author": "ProdigyPNP",
+	"author": "ProdigyPXP",
 	"license": "MPL-2.0",
 	"bugs": {
-		"url": "https://github.com/ProdigyPNP/P-NP/issues"
+		"url": "https://github.com/ProdigyPXP/P-NP/issues"
 	},
-	"homepage": "https://github.com/ProdigyPNP/P-NP#readme",
+	"homepage": "https://github.com/ProdigyPXP/P-NP#readme",
 	"engines": {
 		"node": ">=20"
 	},

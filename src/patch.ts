@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { GUI_LINK, PRODIGY_CODE_ORIGIN, PRODIGY_LOAD_URL, VERSION } from "./constants.js";
 import { displayImages } from "./displayImages.js";
 
+const FETCH_TIMEOUT_MS = 30000;
+
 type GameStatus = {
   gameClientVersion: string;
 };
@@ -14,6 +16,7 @@ export type PatchResult = {
   gameClientVersion: string;
   publicGameHash: string | null;
   loadGamePath: string;
+  patchDegraded: boolean;
 };
 
 const parseGameStatus = (launcherHtml: string): GameStatus => {
@@ -39,7 +42,22 @@ const parsePublicGameHash = (loadGameSource: string): string | null => {
   return hashMatch?.[1] ?? null;
 };
 
-const patchGameFile = (source: string): string => {
+const isJavaScript = (content: string): boolean => {
+  const trimmed = content.trim();
+  if (trimmed.startsWith("<!DOCTYPE") || trimmed.startsWith("<html") || trimmed.startsWith("<HTML")) {
+    return false;
+  }
+  if (trimmed.startsWith("{") && trimmed.includes('"error"')) {
+    return false;
+  }
+  return true;
+};
+
+type PatchContext = {
+  patchDegraded: boolean;
+};
+
+const patchGameFile = (source: string, ctx: PatchContext): string => {
   const app = source.match(/window,function\(([^)]+)\)/)?.[1] ?? null;
   const game = source.match(/var\s+([A-Za-z_$][\w$]*)\s*=\s*\{\}/)?.[1] ?? null;
 
@@ -65,6 +83,9 @@ const patchGameFile = (source: string): string => {
     patches.push([`${app}.constants=Object`, `window._.constants=${app},${app}.constants=Object`]);
     patches.push([`window,function(${app}){var ${game}={};`, `window,function(${app}){var ${game}={};window._.modules=${game};`]);
     patches.push([`${app}.prototype.hasMembership=`, `${game}.prototype.hasMembership=_=>true,${game}.prototype.originalHasMembership=`]);
+  } else {
+    console.warn("WARNING: Could not detect app/game variables. Core patches will be skipped. Setting patchDegraded=true.");
+    ctx.patchDegraded = true;
   }
 
   patches.push(
@@ -191,14 +212,6 @@ setTimeout(() =>
 		)
 	)(), 15000);
 console.trace = () => {};
-
-window.oldLodash = window._;
-let lodashChecker = setInterval(() => {
-	if (window.oldLodash !== window._) {
-		window._ = window.oldLodash;
-		clearInterval(lodashChecker);
-	}
-});
 `;
 
   return `${prefix}\n${patchedCore}\n${suffix}`;
@@ -214,15 +227,25 @@ const patchPublicGameFile = (source: string): string => {
 };
 
 const fetchText = async (url: string): Promise<string> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Request failed for ${url} (${response.status} ${response.statusText}).`);
-  }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-  return response.text();
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`Request failed for ${url} (${response.status} ${response.statusText}).`);
+    }
+
+    const text = await response.text();
+    return text;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 };
 
 export const runPatch = async (outputDir = "patched-output"): Promise<PatchResult> => {
+  const ctx: PatchContext = { patchDegraded: false };
+
   const launcherHtml = await fetchText(PRODIGY_LOAD_URL);
   const gameStatus = parseGameStatus(launcherHtml);
   const loadGameUrl = parseLoadGameUrl(launcherHtml);
@@ -236,13 +259,24 @@ export const runPatch = async (outputDir = "patched-output"): Promise<PatchResul
     fetchText(loadGameUrl)
   ]);
 
+  if (!isJavaScript(gameSource)) {
+    throw new Error(`Fetched game.min.js does not appear to be valid JavaScript.`);
+  }
+  if (!isJavaScript(loadGameSource)) {
+    throw new Error(`Fetched load-game.min.js does not appear to be valid JavaScript.`);
+  }
+
   const publicGameHash = parsePublicGameHash(loadGameSource);
   const publicGameUrl = publicGameHash
     ? `${PRODIGY_CODE_ORIGIN}/js/public-game-${publicGameHash}.min.js`
     : null;
   const publicGameSource = publicGameUrl ? await fetchText(publicGameUrl) : null;
 
-  const patchedGame = patchGameFile(gameSource);
+  if (publicGameSource && !isJavaScript(publicGameSource)) {
+    throw new Error(`Fetched public-game.min.js does not appear to be valid JavaScript.`);
+  }
+
+  const patchedGame = patchGameFile(gameSource, ctx);
   const patchedPublicGame = publicGameSource ? patchPublicGameFile(publicGameSource) : null;
 
   const resolvedOutputDir = path.resolve(outputDir);
@@ -259,6 +293,7 @@ export const runPatch = async (outputDir = "patched-output"): Promise<PatchResul
           gameVersion,
           publicGameHash,
           loadGamePath,
+          patchDegraded: ctx.patchDegraded,
           source: {
             gameUrl,
             publicGameUrl,
@@ -283,7 +318,8 @@ export const runPatch = async (outputDir = "patched-output"): Promise<PatchResul
     outputDir: resolvedOutputDir,
     gameClientVersion: gameVersion,
     publicGameHash,
-    loadGamePath
+    loadGamePath,
+    patchDegraded: ctx.patchDegraded
   };
 };
 
@@ -298,6 +334,9 @@ if (isEntrypoint) {
       console.log(`gameClientVersion=${result.gameClientVersion}`);
       console.log(`publicGameHash=${result.publicGameHash}`);
       console.log(`loadGamePath=${result.loadGamePath}`);
+      if (result.patchDegraded) {
+        console.warn(`WARNING: patchDegraded=true - some patches may not have been applied`);
+      }
     })
     .catch((error: unknown) => {
       const message = error instanceof Error ? error.stack ?? error.message : String(error);

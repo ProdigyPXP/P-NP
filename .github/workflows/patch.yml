@@ -2,11 +2,12 @@ name: Patch Prodigy Files
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   patch:
@@ -16,7 +17,7 @@ jobs:
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -36,6 +37,8 @@ jobs:
         run: pnpm build
 
       - name: Generate patched files
+        id: patch
+        timeout-minutes: 10
         run: pnpm run patch ./patched-output
 
       - name: Publish patched branch
@@ -71,4 +74,17 @@ jobs:
           fi
 
           git commit -m "chore: update patched game files"
-          git push --force origin patched
+          git push origin patched
+
+      - name: Create issue on failure
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "Patch workflow failed" \
+            --body "The patch workflow failed on $(date -u +'%Y-%m-%d %H:%M:%S UTC').
+
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Please investigate the logs for more details."
