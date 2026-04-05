@@ -1,0 +1,74 @@
+name: Patch Prodigy Files
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build patcher
+        run: pnpm build
+
+      - name: Generate patched files
+        run: pnpm run patch ./patched-output
+
+      - name: Publish patched branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p /tmp/patched-artifacts
+          cp -R ./patched-output/. /tmp/patched-artifacts/
+
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+          git fetch origin patched || true
+
+          if git ls-remote --exit-code --heads origin patched > /dev/null 2>&1; then
+            git switch -C patched origin/patched
+          else
+            git switch --orphan patched
+          fi
+
+          find . -mindepth 1 -maxdepth 1 \
+            ! -name .git \
+            -exec rm -rf {} +
+
+          cp -R /tmp/patched-artifacts/. .
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No patch changes to commit"
+            exit 0
+          fi
+
+          git commit -m "chore: update patched game files"
+          git push --force origin patched

@@ -1,85 +1,52 @@
-<h1 align="center"><a href="https://github.com/ProdigyPNP/ProdigyMathGameHacking/blob/master/.github/ANNOUNCEMENT.md">Hacks are being shut down. Thanks for everything.</a></h1>
+# P-NP
 
-<h2 align="center"><a href="https://discord.gg/2qzTbdXSg9">Our Discord server: discord.gg/2qzTbdXSg9</a></h2>
+P-NP is now a static patch pipeline.
 
+The repository no longer runs an HTTP server. Instead, a GitHub Action fetches current Prodigy assets, applies the patcher logic, and pushes the patched files to a dedicated `patched` branch so they can be served from `raw.githubusercontent.com`.
 
+## How It Works
 
-# P-NP Patcher
-P-NP modifies and serves Prodigy's game files.
-<br>
+1. `.github/workflows/patch.yml` runs on hourly cron and manual dispatch.
+2. The workflow builds this project with `pnpm` + `esbuild`.
+3. `src/patch.ts` fetches:
+   - loader HTML from `https://math.prodigygame.com/load`
+   - `game.min.js` from `https://code.prodigygame.com`
+   - the matching `public-game.min.js`
+4. The patcher writes static output files:
+   - `game.min.js`
+   - `public-game.min.js`
+   - `metadata.json`
+5. The workflow commits those files to the `patched` branch.
 
-------
+## Local Usage
 
-# Quickstart
+Requirements:
+- Node.js 20+
+- pnpm
 
-## Shell Script
+Install and build:
+
 ```sh
-git clone https://github.com/ProdigyPNP/P-NP.git
-cd P-NP
 pnpm install
 pnpm build
-node dist
 ```
 
-## Dependencies
-- [Node.js](https://nodejs.org/)
-  - Node.js is the JavaScript runtime that we use
-  - P-NP needs Node.js **v16 or above** to run.
-- [git](https://git-scm.com/)
-  - It's technically possible to run P-NP without git, however git allows easy updating through `git pull`, and lots of other functionality.
-  - Using wget: ```wget https://github.com/ProdigyPNP/P-NP/archive/refs/heads/master.zip && unzip master.zip && rm master.zip && cd master && pnpm install && pnpm build && node dist```
-- [pnpm](https://pnpm.io/)
-  - It's the package manager we here at ProdigyPNP use. It's much better than the normal npm for a variety of reasons.
-  - Technically possible to use npm/yarn instead of pnpm for P-NP, but not reccomended.
-
-<br><br>
-
-
-# Repl
-
-## Running P-NP on Repl.it
-Repl is a bit wacky, since it uses a very old version of Node.js. This makes P-NP throw an error, but there is a fix.
-
-1. Make a [new **Repl**](https://repl.it/new).
-2. Click **Import from GitHub**.
-3. Paste this in GitHub URL: ``https://github.com/ProdigyPNP/P-NP.git``.
-4. Click **+ Import from GitHub**.
-5. If you get a popup from Repl saying "configure the start button", click **OK**.
-6. On the right half of the screen, there should be a tab that says **Shell**. Click it.
-7. Paste the code snippet below into the shell. Once it's finished, click the Start button.
+Run patch locally:
 
 ```sh
-node -v
-npm i --save-dev node@16
-npm config set prefix=$(pwd)/node_modules/node
-export PATH=$(pwd)/node_modules/node/bin:$PATH
-node -v
-
+pnpm run patch
 ```
 
-<br><br>
+Optional custom output directory:
 
-# Node.js Package
-
-P-NP is available on npmjs at https://npmjs.com/package/p-np-patcher.
-
-## Install
-```shell
-pnpm install p-np-patcher
+```sh
+node dist/patch.js ./patched-output
 ```
 
-## Uninstall
-```shell
-pnpm remove p-np-patcher
-```
+## Static File URLs
 
-### Import
-P-NP supports ES Modules/TypeScript, and not CommonJS.
-```es6
-import PNP from "p-np-patcher";
-```
+After the Action publishes to the `patched` branch, files are available at:
 
-<br>
-
-
-<br>
+- `https://raw.githubusercontent.com/<owner>/<repo>/patched/game.min.js`
+- `https://raw.githubusercontent.com/<owner>/<repo>/patched/public-game.min.js`
+- `https://raw.githubusercontent.com/<owner>/<repo>/patched/metadata.json`

@@ -140,8 +140,11 @@ jspm_packages/
 
 
 # Generated lock files
-pnpm-lock.yaml
 package-lock.json
+
+# Build outputs
+dist/
+patched-output/
 
 # IntelliJ Idea Project Config
 /.idea/
