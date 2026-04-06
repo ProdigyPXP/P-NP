@@ -303,7 +303,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
 setTimeout(() =>
   (async () => {
     try {
-      const guiUrl = window.__PHEX_GUI_URL__ || "${GUI_LINK}";
+      const guiUrl = window.__ORIGIN_GUI_URL__ || "${GUI_LINK}";
       eval(await (await fetch(guiUrl)).text());
     } catch(e) {
       console.error("[P-NP] CheatGUI load failed:", e);
