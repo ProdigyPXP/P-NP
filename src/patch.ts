@@ -92,7 +92,15 @@ const patchGameFile = (source: string, ctx: PatchContext): string => {
   // CheatGUI can toggle it dynamically AFTER the game finishes initializing.
   // The service ID is "859-25be" and the property is .isMember.
 
-  // ── 3. Expose Constants Map ──
+  // ── 3. Fix duplicate Inversify bindings ──
+  // Replace all gameContainer.bind(X) with __pnp_safeBind(gameContainer, X)
+  // This is a global regex that catches every instance in the webpack bundle.
+  patches.push([
+    /([A-Za-z_$][\w$]*\.q\.instance\.prodigy\.gameContainer)\.bind\(/g,
+    `window.__pnp_safeBind($1,`
+  ]);
+
+  // ── 4. Expose Constants Map ──
   // The game defines: A.constants={"GameConstants.Build.VERSION":"2026.18.1",...}
   // We capture this object to window so the suffix can create a Map from it.
   patches.push([
@@ -153,14 +161,52 @@ console.log = (...d) => {
 if (typeof window._ === 'undefined' || window._ === null) window._ = {};
 window.__PNP_ORIG_UNDERSCORE__ = window._;
 window._.variables = Object.create(null);
+/** Pre-init _.constants as empty obj with Map-like API so game-side patches don't crash
+ *  before the suffix wires up __PNP_CONSTANTS_RAW__. Real values populated post-game-load. **/
+if (!window._.constants) {
+  var _c = Object.create(null);
+  _c.get = function(k) { return _c[k]; };
+  _c.set = function(k, v) { _c[k] = v; return _c; };
+  _c.has = function(k) { return k in _c; };
+  _c.constants = _c;
+  window._.constants = _c;
+}
+
+/** Fix Inversify duplicate binding errors (e.g. "Ambiguous match: MathTower").
+ *  Some installers bind services to the GLOBAL gameContainer and can fire more
+ *  than once in the patched execution context. We define a helper that the
+ *  game-code patch below uses to safely bind (rebind if already bound). */
+window.__pnp_safeBind = function(container, id) {
+  return container.isBound(id) ? container.rebind(id) : container.bind(id);
+};
+
+/** Guard SW.Load.decrementLoadSemaphore against duplicate calls.
+ *  ROOT CAUSE: The old extension build (fetch+onreset approach) appends a second
+ *  SW.Load.decrementLoadSemaphore() call after the game code, AND the patcher
+ *  suffix calls it too → createGame() fires twice → all Inversify bind() calls
+ *  run twice on the same container → "Ambiguous match found for MathTower" crash.
+ *
+ *  Fix: wrap the function so only the FIRST call triggers createGame().
+ *  This works for both old extension (fetch+onreset) and new extension (doc-rewrite). */
+if (typeof SW !== 'undefined' && SW.Load && typeof SW.Load.decrementLoadSemaphore === 'function') {
+  var _pnpOrigDecrement = SW.Load.decrementLoadSemaphore.bind(SW.Load);
+  SW.Load.decrementLoadSemaphore = function() {
+    if (window.__PNP_SEM_DECREMENTED__) {
+      console.warn("[P-NP] SW.Load.decrementLoadSemaphore() called twice — blocking duplicate createGame()");
+      return;
+    }
+    window.__PNP_SEM_DECREMENTED__ = true;
+    return _pnpOrigDecrement();
+  };
+}
 `;
 
   // ── Suffix: runs AFTER game code ──
   const suffix = `
 /** P-NP Patcher v${VERSION} — Suffix **/
 
-/* ── 1. Immediate: Signal game loaded ── */
-SW.Load.onGameLoad();
+/* ── 1. Immediate: Signal game script loaded ── */
+SW.Load.decrementLoadSemaphore();
 console.log("%cP-NP Patcher", "font-size:40px;color:#540052;font-weight:900;font-family:sans-serif;");
 console.log("%cVersion ${VERSION}", "font-size:20px;color:#000025;font-weight:700;font-family:sans-serif;");
 console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(displayImages)}));
@@ -181,9 +227,20 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
       enumerable: true, configurable: true
     });
 
-    /* _.constants → Map built from the raw constants object */
+    /* _.constants → raw plain object with Map-compatible .get()/.set() + self-alias .constants
+     * WHY: cheatGUI uses _.constants.constants["GameConstants.X"] = val (plain object writes)
+     *      patcher game-side bypasses use _.constants.get("GameConstants.X") (Map-like reads)
+     *      Both must work on the same underlying storage. We make _.constants the raw object
+     *      and bolt on get/set/has methods + a .constants self-alias so every call site works. */
     if (W.__PNP_CONSTANTS_RAW__) {
-      W._.constants = new Map(Object.entries(W.__PNP_CONSTANTS_RAW__));
+      var raw = W.__PNP_CONSTANTS_RAW__;
+      /* bolt Map-like API onto the plain object */
+      raw.get = function(key) { return raw[key]; };
+      raw.set = function(key, val) { raw[key] = val; return raw; };
+      raw.has = function(key) { return key in raw; };
+      /* self-alias: _.constants.constants["GameConstants.X"] = val */
+      raw.constants = raw;
+      W._.constants = raw;
     }
 
     /* _.player → player service from DI container */
@@ -275,6 +332,19 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
       if (!desc || !desc.get || !window.__PNP__) {
         _applyProps();
       }
+      /* Singleton auto-fix: the constructor may fire twice (onreset context).
+         Our patch captures the first instance, but the REAL fully-initialized
+         singleton (with #prodigy set) is stored on the class's static _instance.
+         Detect the mismatch and update __PNP__ to the real one. */
+      if (window.__PNP__ && !window.__PNP__.prodigy) {
+        try {
+          var ctor = Object.getPrototypeOf(window.__PNP__).constructor;
+          if (ctor._instance && ctor._instance !== window.__PNP__ && ctor._instance.prodigy) {
+            window.__PNP__ = ctor._instance;
+            console.log("[P-NP] Singleton auto-fixed to real instance (prodigy available)");
+          }
+        } catch(e) {}
+      }
       /* Lazy-resolve NetworkManager: it registers AFTER game init,
          so we poll until we can cache it. */
       if (!window.__PNP_NETWORK__ && window.__PNP__) {
@@ -303,8 +373,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
 setTimeout(() =>
   (async () => {
     try {
-      const guiUrl = window.__ORIGIN_GUI_URL__ || "${GUI_LINK}";
-      eval(await (await fetch(guiUrl)).text());
+      eval(await (await fetch("${GUI_LINK}")).text());
     } catch(e) {
       console.error("[P-NP] CheatGUI load failed:", e);
     }
