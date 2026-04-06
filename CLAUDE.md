@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-P-NP is a static patch pipeline for Prodigy Math Game. It runs as a GitHub Action every 2 hours, fetches the latest Prodigy game files, applies patches (hack injection points, auto-answer, lodash preservation, membership bypass), and commits the patched files to the `patched` branch.
+P-NP is a static patch pipeline for Prodigy Math Game. It runs as a GitHub Action every 2 hours, fetches the latest Prodigy game files, applies patches (hack injection points, auto-answer, lodash preservation, membership bypass), and commits the patched files to `dist/` on master.
 
-The PHEx browser extension (in ProdigyPXP/ProdigyMathGameHacking) fetches the patched `game.min.js` from this repo's `patched` branch.
+The Prodigy Origin extension (in ProdigyPXP/ProdigyMathGameHacking) fetches the patched `game.min.js` from this repo's `dist/` directory on master.
 
 ### Architecture
 
@@ -12,7 +12,7 @@ The PHEx browser extension (in ProdigyPXP/ProdigyMathGameHacking) fetches the pa
 - **src/constants.ts** — URLs, version, GUI link.
 - **src/displayImages.ts** — Console splash images.
 - **build.mjs** — esbuild build script.
-- **.github/workflows/patch.yml** — GitHub Action: runs every 2 hours, builds and runs patcher, commits to `patched` branch.
+- **.github/workflows/patch.yml** — GitHub Action: runs every 2 hours, builds and runs patcher, commits patched files to `dist/` on master.
 
 ### Key Technical Details
 
@@ -27,7 +27,7 @@ The PHEx browser extension (in ProdigyPXP/ProdigyMathGameHacking) fetches the pa
 ## Critical Rules
 
 1. **ZERO references to old organization.** Never use "ProdigyPNP", "afkvido", or "infinitezero.net". Always use "ProdigyPXP" and "alexey-max-fedorov".
-2. **Keep git history** — no force pushes to `patched` branch.
+2. **Keep git history** — no force pushes to master.
 3. **Use pnpm**, never npm.
 4. **Graceful degradation** — never crash silently. Set `patchDegraded` flag and create GitHub issues.
 5. **30-second fetch timeout** on all network requests.

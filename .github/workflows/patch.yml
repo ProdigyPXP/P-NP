@@ -39,42 +39,28 @@ jobs:
       - name: Generate patched files
         id: patch
         timeout-minutes: 10
-        run: pnpm run patch ./patched-output
+        run: pnpm run patch ./dist
 
-      - name: Publish patched branch
+      - name: Commit patched files to master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          mkdir -p /tmp/patched-artifacts
-          cp -R ./patched-output/. /tmp/patched-artifacts/
-
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          git fetch origin patched || true
+          git add dist/game.min.js dist/metadata.json
+          git add dist/public-game.min.js 2>/dev/null || true
 
-          if git ls-remote --exit-code --heads origin patched > /dev/null 2>&1; then
-            git switch -C patched origin/patched
-          else
-            git switch --orphan patched
-          fi
-
-          find . -mindepth 1 -maxdepth 1 \
-            ! -name .git \
-            -exec rm -rf {} +
-
-          cp -R /tmp/patched-artifacts/. .
-
-          git add -A
           if git diff --cached --quiet; then
             echo "No patch changes to commit"
             exit 0
           fi
 
           git commit -m "chore: update patched game files"
-          git push origin patched
+          git pull --rebase origin master
+          git push origin master
 
       - name: Create issue on failure
         if: failure()

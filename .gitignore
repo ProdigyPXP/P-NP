@@ -142,8 +142,9 @@ jspm_packages/
 # Generated lock files
 package-lock.json
 
-# Build outputs
-dist/
+# Build outputs (esbuild intermediates — patched game files are tracked)
+dist/patch.js
+dist/patch.js.map
 patched-output/
 
 # IntelliJ Idea Project Config
