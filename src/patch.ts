@@ -276,10 +276,12 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
       W._.constants = raw;
     }
 
-    /* _.player → discovered dynamically from DI container by shape */
+    /* _.player → discovered dynamically from DI container by shape.
+     * Cache the SERVICE (stable ref), not the player object (.player getter
+     * returns a new object each call). */
     Object.defineProperty(W._, "player", {
       get: function() {
-        if (W.__PNP_PLAYER__) return W.__PNP_PLAYER__;
+        if (W.__PNP_PLAYER_SVC__) return W.__PNP_PLAYER_SVC__.player;
         try {
           var gc = W.__PNP__ && W.__PNP__.prodigy && W.__PNP__.prodigy.gameContainer;
           if (!gc) return null;
@@ -287,9 +289,9 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
             try { var p = inst.player; return p && typeof p === 'object' && ('data' in p); }
             catch(e) { return false; }
           }, "PlayerService");
-          if (svc && svc.player) {
-            W.__PNP_PLAYER__ = svc.player;
-            return W.__PNP_PLAYER__;
+          if (svc) {
+            W.__PNP_PLAYER_SVC__ = svc;
+            return svc.player;
           }
         } catch(e) {}
         return null;
@@ -392,7 +394,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
         } catch(e) {}
       }
       /* Trigger lazy discovery for player and network via their getters */
-      if (!window.__PNP_PLAYER__ && window.__PNP__) {
+      if (!window.__PNP_PLAYER_SVC__ && window.__PNP__) {
         try { void window._.player; } catch(e) {}
       }
       if (!window.__PNP_NETWORK__ && window.__PNP__) {
