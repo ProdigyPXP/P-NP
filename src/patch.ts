@@ -177,7 +177,13 @@ if (!window._.constants) {
  *  than once in the patched execution context. We define a helper that the
  *  game-code patch below uses to safely bind (rebind if already bound). */
 window.__pnp_safeBind = function(container, id) {
-  return container.isBound(id) ? container.rebind(id) : container.bind(id);
+  try {
+    var inv = container._inversifyContainer || container;
+    if (typeof inv.isBound === 'function' && inv.isBound(id)) {
+      return (typeof container.rebind === 'function') ? container.rebind(id) : inv.rebind(id);
+    }
+  } catch(e) {}
+  return container.bind(id);
 };
 
 /** Guard SW.Load.decrementLoadSemaphore against duplicate calls.
@@ -188,6 +194,33 @@ window.__pnp_safeBind = function(container, id) {
  *
  *  Fix: wrap the function so only the FIRST call triggers createGame().
  *  This works for both old extension (fetch+onreset) and new extension (doc-rewrite). */
+/** Runtime service discovery — enumerate Inversify bindings and match by shape (duck-typing).
+ *  This replaces hardcoded service IDs that break every game update. */
+window.__pnp_discoverService = function(gc, shapeFn, label) {
+  try {
+    var map = gc._inversifyContainer._bindingDictionary._map;
+    if (!map) return null;
+    var hexPattern = /^[0-9a-f]{2,4}-[0-9a-f]{2,6}$/;
+    var iter = map.keys();
+    var next = iter.next();
+    while (!next.done) {
+      var id = next.value;
+      next = iter.next();
+      if (typeof id !== 'string' || !hexPattern.test(id)) continue;
+      try {
+        var inst = gc.get(id);
+        if (inst && shapeFn(inst)) {
+          console.log("[P-NP] Discovered " + label + " \\u2192 " + id);
+          return inst;
+        }
+      } catch(e) {}
+    }
+  } catch(e) {
+    console.warn("[P-NP] Discovery failed for " + label + ":", e);
+  }
+  return null;
+};
+
 if (typeof SW !== 'undefined' && SW.Load && typeof SW.Load.decrementLoadSemaphore === 'function') {
   var _pnpOrigDecrement = SW.Load.decrementLoadSemaphore.bind(SW.Load);
   SW.Load.decrementLoadSemaphore = function() {
@@ -243,11 +276,23 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
       W._.constants = raw;
     }
 
-    /* _.player → player service from DI container */
+    /* _.player → discovered dynamically from DI container by shape */
     Object.defineProperty(W._, "player", {
-      get: () => {
-        try { return W.__PNP__?.prodigy?.gameContainer?.get("3e5-dac1")?.player; }
-        catch(e) { return null; }
+      get: function() {
+        if (W.__PNP_PLAYER__) return W.__PNP_PLAYER__;
+        try {
+          var gc = W.__PNP__ && W.__PNP__.prodigy && W.__PNP__.prodigy.gameContainer;
+          if (!gc) return null;
+          var svc = W.__pnp_discoverService(gc, function(inst) {
+            try { var p = inst.player; return p && typeof p === 'object' && ('data' in p); }
+            catch(e) { return false; }
+          }, "PlayerService");
+          if (svc && svc.player) {
+            W.__PNP_PLAYER__ = svc.player;
+            return W.__PNP_PLAYER__;
+          }
+        } catch(e) {}
+        return null;
       },
       enumerable: true, configurable: true
     });
@@ -270,16 +315,18 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
       enumerable: true, configurable: true
     });
 
-    /* _.network → NetworkManager from DI container (service "e2e-9e38")
-       CheatGUI expects: _.network.processPlayer (bool), _.network.game._paused,
-       _.network.getCharData(uid) */
+    /* _.network → discovered dynamically from DI container by shape */
     Object.defineProperty(W._, "network", {
       get: function() {
         if (W.__PNP_NETWORK__) return W.__PNP_NETWORK__;
         try {
           var gc = W.__PNP__ && W.__PNP__.prodigy && W.__PNP__.prodigy.gameContainer;
           if (!gc) return null;
-          var nm = gc.get("e2e-9e38");
+          var nm = W.__pnp_discoverService(gc, function(inst) {
+            return typeof inst.getCharData === 'function'
+                && ('processPlayer' in inst)
+                && typeof inst.sendZoneEvent === 'function';
+          }, "NetworkManager");
           if (nm && typeof nm === "object") {
             if (!nm.game) {
               Object.defineProperty(nm, "game", {
@@ -288,7 +335,6 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
               });
             }
             W.__PNP_NETWORK__ = nm;
-            console.log("[P-NP] NetworkManager resolved (e2e-9e38)");
             return nm;
           }
         } catch(e) {}
@@ -345,25 +391,12 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
           }
         } catch(e) {}
       }
-      /* Lazy-resolve NetworkManager: it registers AFTER game init,
-         so we poll until we can cache it. */
+      /* Trigger lazy discovery for player and network via their getters */
+      if (!window.__PNP_PLAYER__ && window.__PNP__) {
+        try { void window._.player; } catch(e) {}
+      }
       if (!window.__PNP_NETWORK__ && window.__PNP__) {
-        try {
-          var gc = window.__PNP__.prodigy && window.__PNP__.prodigy.gameContainer;
-          if (gc) {
-            var nm = gc.get("e2e-9e38");
-            if (nm && typeof nm === "object") {
-              if (!nm.game) {
-                Object.defineProperty(nm, "game", {
-                  get: function() { return window.__PNP__ && window.__PNP__.game; },
-                  enumerable: true, configurable: true
-                });
-              }
-              window.__PNP_NETWORK__ = nm;
-              console.log("[P-NP] NetworkManager resolved (e2e-9e38)");
-            }
-          }
-        } catch(e) { /* service not registered yet */ }
+        try { void window._.network; } catch(e) {}
       }
     } catch(e) { _applyProps(); }
   }, 500);
