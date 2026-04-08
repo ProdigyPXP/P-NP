@@ -1,35 +1,35 @@
 {
-	"name": "p-np-patcher",
-	"version": "4.0.0",
-	"description": "Fetches and patches Prodigy game files for static hosting",
-	"main": "./dist/patch.js",
-	"type": "module",
-	"scripts": {
-		"build": "node build.mjs",
-		"patch": "node dist/patch.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/ProdigyPXP/P-NP.git"
-	},
-	"author": "ProdigyPXP",
-	"license": "MPL-2.0",
-	"bugs": {
-		"url": "https://github.com/ProdigyPXP/P-NP/issues"
-	},
-	"homepage": "https://github.com/ProdigyPXP/P-NP#readme",
-	"engines": {
-		"node": ">=20"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	},
-	"devDependencies": {
-		"@types/node": "^24.5.2",
-		"esbuild": "^0.25.9",
-		"typescript": "^5.9.2"
-	},
-	"dependencies": {}
+  "name": "p-np-patcher",
+  "version": "4.1.0",
+  "description": "Fetches and patches Prodigy game files for static hosting",
+  "main": "./dist/patch.js",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "patch": "node dist/patch.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProdigyPXP/P-NP.git"
+  },
+  "author": "ProdigyPXP",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/ProdigyPXP/P-NP/issues"
+  },
+  "homepage": "https://github.com/ProdigyPXP/P-NP#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "esbuild": "^0.25.9",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {}
 }
