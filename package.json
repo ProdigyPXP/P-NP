@@ -1,6 +1,6 @@
 {
   "name": "p-np-patcher",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Fetches and patches Prodigy game files for static hosting",
   "main": "./dist/patch.js",
   "type": "module",
