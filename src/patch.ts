@@ -101,11 +101,12 @@ const patchGameFile = (source: string, ctx: PatchContext): string => {
   ]);
 
   // ── 4. Expose Constants Map ──
-  // The game defines: A.constants={"GameConstants.Build.VERSION":"2026.18.1",...}
-  // We capture this object to window so the suffix can create a Map from it.
+  // The game defines: <var>.constants={"GameConstants.Build.VERSION":"2026.18.1",...}
+  // The minifier-assigned variable name drifts every build (A, f, M, ...), so we
+  // match any single identifier prefix rather than hardcoding one.
   patches.push([
-    `A.constants={"GameConstants`,
-    `A.constants=window.__PNP_CONSTANTS_RAW__={"GameConstants`
+    /([A-Za-z_$][\w$]*)\.constants=\{"GameConstants/,
+    `$1.constants=window.__PNP_CONSTANTS_RAW__={"GameConstants`
   ]);
 
   // ── 4. Answer Question Bypass (modern class method syntax) ──
@@ -350,15 +351,79 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
       get: () => W._, enumerable: true, configurable: true
     });
 
-    /* Escape battle helper */
+    /* Escape battle helper — handles SecureBattleRevamp via BattleController */
     W._.functions.escapeBattle = () => {
       try {
         const g = W.__PNP__?.game;
         const currentState = g?.state?.current;
-        if (currentState === "PVP") g.state.states.PVP.endPVP();
-        else if (currentState === "CoOp") W.__PNP__.prodigy.world.$(W._.player?.data?.zone);
-        else g?.state?.callbackContext?.runAwayCallback();
+        if (currentState === "PVP") {
+          g.state.states.PVP.endPVP();
+        } else if (currentState === "CoOp") {
+          W.__PNP__.prodigy.world.$(W._.player?.data?.zone);
+        } else if (currentState === "SecureBattleRevamp") {
+          const st = g.state.states.get("SecureBattleRevamp");
+          const bc = st?._battleController;
+          if (bc?.escapeBattle) bc.escapeBattle();
+          else g?.state?.callbackContext?.runAwayCallback();
+        } else {
+          g?.state?.callbackContext?.runAwayCallback();
+        }
       } catch(e) { console.warn("[P-NP] escapeBattle failed:", e); }
+    };
+
+    /* _.membership → discovered by shape (isMember getter + hasFeatureAccess).
+     * Service ID drifts per build; shape is stable. */
+    Object.defineProperty(W._, "membership", {
+      get: function() {
+        if (W.__PNP_MEMBERSHIP__) return W.__PNP_MEMBERSHIP__;
+        try {
+          var gc = W.__PNP__ && W.__PNP__.prodigy && W.__PNP__.prodigy.gameContainer;
+          if (!gc) return null;
+          var ms = W.__pnp_discoverService(gc, function(inst) {
+            return inst && typeof inst.hasFeatureAccess === 'function'
+                && 'isMember' in inst;
+          }, "MembershipService");
+          if (ms) { W.__PNP_MEMBERSHIP__ = ms; return ms; }
+        } catch(e) {}
+        return null;
+      },
+      enumerable: true, configurable: true
+    });
+
+    /* _.functions.setMembership(bool) — deep membership override.
+       memberTier is derived from three hasFeatureAccess checks, so forcing it to return
+       true auto-promotes to Ultra tier. We snapshot the original _data on first call so
+       disable restores it. */
+    W._.functions.setMembership = function(active) {
+      var ms = W._.membership;
+      if (!ms) return false;
+      if (!W.__PNP_MEMBERSHIP_ORIG__) {
+        W.__PNP_MEMBERSHIP_ORIG__ = { data: ms._data };
+      }
+      if (active) {
+        var start = new Date(Date.now() - 86400000).toISOString();
+        var end = new Date(Date.now() + 365 * 86400000 * 10).toISOString();
+        ms._data = {
+          active: true,
+          features: [],
+          membershipStartTs: start,
+          membershipEndTs: end
+        };
+        Object.defineProperty(ms, "hasFeatureAccess", {
+          value: function() { return true; },
+          configurable: true, writable: true
+        });
+        try { ms.updateMembershipDates && ms.updateMembershipDates(); } catch(e) {}
+        try { W._.player && W._.player.unlockMemberItems && W._.player.unlockMemberItems(); } catch(e) {}
+      } else {
+        ms._data = W.__PNP_MEMBERSHIP_ORIG__.data;
+        if (Object.getOwnPropertyDescriptor(ms, "hasFeatureAccess")) {
+          delete ms.hasFeatureAccess;
+        }
+        try { ms.updateMembershipDates && ms.updateMembershipDates(); } catch(e) {}
+      }
+      try { W._.player && (W._.player.appearanceChanged = true); } catch(e) {}
+      return true;
     };
 
     if (!W.__PNP_PROPS_APPLIED__) {

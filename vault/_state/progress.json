@@ -1,0 +1,506 @@
+{
+  "version": "2026.18.1",
+  "startedAt": null,
+  "lastUpdated": "2026-04-13T12:30:00.000Z",
+  "domains": {
+    "core-bootstrap": {
+      "status": "complete",
+      "startedAt": "2026-04-13T00:00:00.000Z",
+      "completedAt": "2026-04-13T00:30:00.000Z",
+      "agentId": "core-bootstrap-agent",
+      "modulesAnalyzed": [
+        "61806",
+        "35120",
+        "36361",
+        "3004",
+        "42979",
+        "81687"
+      ],
+      "notesCreated": [
+        "core-bootstrap-di-container.md"
+      ],
+      "serviceIdsFound": [
+        "3e5-dac1",
+        "859-25be",
+        "e2e-9e38",
+        "6c6-02da",
+        "09c-7a49",
+        "fa8-1c91",
+        "f4b-0454",
+        "35d-3bd9",
+        "76f-ff9c",
+        "bc6-2de9",
+        "2f4-8290",
+        "914-e029",
+        "006-df12",
+        "1b9-7c6a",
+        "31b-2a99",
+        "103-382e",
+        "749-61df",
+        "a5a-3029",
+        "91b-7302",
+        "a8f-1513",
+        "f9c-a49f",
+        "b4d-59fa",
+        "3e0-f05f",
+        "824-bd4f",
+        "76c-8a05",
+        "d79-f761",
+        "970-d7f0",
+        "a7e-4ed4",
+        "6ef-abaa",
+        "e80-ffcd",
+        "982-f50d",
+        "ab9-3b05",
+        "8b8-ac14"
+      ],
+      "checkpoint": null
+    },
+    "player": {
+      "status": "complete",
+      "startedAt": "2026-04-13T10:00:00.000Z",
+      "completedAt": "2026-04-13T10:30:00.000Z",
+      "agentId": "player-agent",
+      "modulesAnalyzed": [
+        "129",
+        "96535",
+        "71543",
+        "82209",
+        "1195",
+        "34992",
+        "51894",
+        "39984",
+        "37465"
+      ],
+      "notesCreated": [
+        "player-active-player.md"
+      ],
+      "serviceIdsFound": [
+        "3e5-dac1",
+        "f4b-0454",
+        "859-25be",
+        "749-61df",
+        "e2e-9e38"
+      ],
+      "checkpoint": null
+    },
+    "network": {
+      "status": "complete",
+      "startedAt": "2026-04-13T10:00:00.000Z",
+      "completedAt": "2026-04-13T10:30:00.000Z",
+      "agentId": "network-agent",
+      "modulesAnalyzed": [
+        "10312",
+        "200",
+        "35564",
+        "62459",
+        "89839",
+        "70330",
+        "5668"
+      ],
+      "notesCreated": [
+        "network-game-network-manager.md",
+        "network-http-socket-infrastructure.md"
+      ],
+      "serviceIdsFound": [
+        "e2e-9e38",
+        "e80-ffcd",
+        "6ac-4dfc",
+        "e05-96db",
+        "c59-add2"
+      ],
+      "checkpoint": null
+    },
+    "battle": {
+      "status": "complete",
+      "startedAt": "2026-04-13T12:00:00.000Z",
+      "completedAt": "2026-04-13T12:35:00.000Z",
+      "agentId": "battle-agent",
+      "modulesAnalyzed": [
+        "34829",
+        "28628",
+        "88541",
+        "52551",
+        "48417",
+        "6452",
+        "13302",
+        "60155",
+        "58203",
+        "37987",
+        "96535",
+        "2652",
+        "71543",
+        "81687",
+        "41866",
+        "11454",
+        "58690",
+        "54705"
+      ],
+      "notesCreated": [
+        "battle-system.md",
+        "battle-constants-and-types.md"
+      ],
+      "serviceIdsFound": [
+        "35d-3bd9",
+        "4ad-1685",
+        "16b-0e3b",
+        "f4b-0454",
+        "3e5-dac1",
+        "fa8-1c91",
+        "859-25be",
+        "824-bd4f",
+        "ab9-3b05"
+      ],
+      "checkpoint": null,
+      "lastUpdated": "2026-04-13T12:35:00.000Z"
+    },
+    "pets": {
+      "status": "complete",
+      "startedAt": "2026-04-13T12:00:00.000Z",
+      "completedAt": "2026-04-13T12:30:00.000Z",
+      "agentId": "pets-agent",
+      "modulesAnalyzed": [
+        "39984",
+        "37465",
+        "55734",
+        "63834",
+        "25834",
+        "43754",
+        "22023",
+        "9860",
+        "48417"
+      ],
+      "notesCreated": [
+        "pets-kennel-system.md"
+      ],
+      "serviceIdsFound": [
+        "31b-2a99",
+        "17c-e966",
+        "a8f-1513",
+        "a5a-3029"
+      ],
+      "checkpoint": null
+    },
+    "inventory": {
+      "status": "complete",
+      "startedAt": "2026-04-13T12:00:00.000Z",
+      "completedAt": "2026-04-13T12:45:00.000Z",
+      "agentId": "inventory-agent",
+      "modulesAnalyzed": [
+        "51894",
+        "56463",
+        "37639",
+        "77938",
+        "129",
+        "108991"
+      ],
+      "notesCreated": [
+        "inventory-backpack.md",
+        "inventory-equipment.md",
+        "inventory-secure-inventory.md",
+        "inventory-game-item-manager.md"
+      ],
+      "serviceIdsFound": [
+        "b2d-0f23",
+        "fa8-1c91"
+      ],
+      "checkpoint": null
+    },
+    "quests": {
+      "status": "complete",
+      "startedAt": "2026-04-13T12:00:00.000Z",
+      "completedAt": "2026-04-13T12:30:00.000Z",
+      "agentId": "quests-agent",
+      "modulesAnalyzed": [
+        "78698",
+        "3001",
+        "45918",
+        "80434",
+        "87761",
+        "3606",
+        "98938",
+        "62886",
+        "29891",
+        "7408"
+      ],
+      "notesCreated": [
+        "quests-quest-manager-system.md"
+      ],
+      "serviceIdsFound": [
+        "ab9-3b05",
+        "b14-a6b7",
+        "c90-6dce",
+        "d16-ba07",
+        "86a-826a",
+        "0a9-669a",
+        "8b8-ac14",
+        "e53-774e",
+        "a9e-dc91",
+        "722-6296",
+        "585-efc5",
+        "143-913d",
+        "703-efc4",
+        "744-2b2d",
+        "2d7-2d0f",
+        "a52-9759",
+        "432-1663",
+        "3da-ab92",
+        "46a-5a7f"
+      ],
+      "checkpoint": null
+    },
+    "zones": {
+      "status": "complete",
+      "startedAt": "2026-04-13T10:00:00.000Z",
+      "completedAt": "2026-04-13T10:45:00.000Z",
+      "agentId": "zones-agent",
+      "modulesAnalyzed": [
+        "73678",
+        "87820",
+        "7612",
+        "26022",
+        "2212",
+        "76224",
+        "30226",
+        "4234"
+      ],
+      "notesCreated": [
+        "zones-world-manager.md",
+        "zones-map-data.md"
+      ],
+      "serviceIdsFound": [
+        "91b-7302",
+        "824-bd4f",
+        "09c-7a49",
+        "35d-3bd9",
+        "e2e-9e38",
+        "3e0-f05f",
+        "fa8-1c91",
+        "3e5-dac1",
+        "ab9-3b05",
+        "d79-6645"
+      ],
+      "checkpoint": null
+    },
+    "ui-framework": {
+      "status": "complete",
+      "startedAt": "2026-04-13T00:00:00.000Z",
+      "completedAt": "2026-04-13T00:00:00.000Z",
+      "agentId": "ui-framework-agent",
+      "modulesAnalyzed": [
+        "81687",
+        "21738",
+        "82680",
+        "62459",
+        "27780",
+        "19587"
+      ],
+      "notesCreated": [
+        "ui-framework-open-system.md"
+      ],
+      "serviceIdsFound": [
+        "824-bd4f"
+      ],
+      "checkpoint": null
+    },
+    "data-models": {
+      "status": "complete",
+      "startedAt": "2026-04-13T04:00:00.000Z",
+      "completedAt": "2026-04-13T04:30:00.000Z",
+      "agentId": "data-models-agent",
+      "modulesAnalyzed": [
+        "51151"
+      ],
+      "notesCreated": [
+        "data-models-protobuf.md"
+      ],
+      "serviceIdsFound": [],
+      "checkpoint": null
+    },
+    "economy": {
+      "status": "complete",
+      "startedAt": "2026-04-13T16:00:00.000Z",
+      "completedAt": "2026-04-13T16:45:00.000Z",
+      "agentId": "economy-agent",
+      "modulesAnalyzed": [
+        "90744",
+        "43754",
+        "10471",
+        "13381",
+        "42959",
+        "2519",
+        "23283",
+        "41674"
+      ],
+      "notesCreated": [
+        "economy-currency-and-payment.md",
+        "economy-prize-wheel.md",
+        "economy-shop-analytics.md"
+      ],
+      "serviceIdsFound": ["0b9-1977", "50c-4791", "31b-2a99"],
+      "checkpoint": null,
+      "lastUpdated": "2026-04-13T16:45:00.000Z"
+    },
+    "education": {
+      "status": "complete",
+      "startedAt": "2026-04-13T12:00:00.000Z",
+      "completedAt": "2026-04-13T12:30:00.000Z",
+      "agentId": "education-agent",
+      "modulesAnalyzed": [
+        "81687",
+        "96535",
+        "66930",
+        "15678",
+        "35629",
+        "82142",
+        "9439"
+      ],
+      "notesCreated": [
+        "education-system.md"
+      ],
+      "serviceIdsFound": [
+        "fa8-1c91",
+        "e2e-9e38",
+        "3e5-dac1",
+        "859-25be"
+      ],
+      "checkpoint": null
+    },
+    "festivals": {
+      "status": "complete",
+      "startedAt": "2026-04-13T15:00:00.000Z",
+      "completedAt": "2026-04-13T15:30:00.000Z",
+      "agentId": "festivals-agent",
+      "modulesAnalyzed": [
+        "94393",
+        "53037",
+        "51540",
+        "71698",
+        "46902",
+        "57797",
+        "88022"
+      ],
+      "notesCreated": [
+        "festivals-weekend-events.md"
+      ],
+      "serviceIdsFound": [
+        "1b9-7c6a",
+        "86a-826a",
+        "c0e-cbd7"
+      ],
+      "checkpoint": null
+    },
+    "dungeons": {
+      "status": "complete",
+      "startedAt": "2026-04-13T17:00:00.000Z",
+      "completedAt": "2026-04-13T17:30:00.000Z",
+      "agentId": "dungeons-agent",
+      "modulesAnalyzed": [
+        "50751",
+        "62901_area",
+        "10730",
+        "28930",
+        "153368_area",
+        "154963_area",
+        "155145",
+        "155157_area",
+        "113288_area",
+        "116087_area",
+        "136154_area",
+        "237560_area",
+        "240817_area",
+        "255057_area"
+      ],
+      "notesCreated": [
+        "dungeons-system.md"
+      ],
+      "serviceIdsFound": [
+        "b5f-11e9",
+        "DungeonDataProvider",
+        "129-07a6",
+        "9cb-d480"
+      ],
+      "checkpoint": null,
+      "lastUpdated": "2026-04-13T17:30:00.000Z"
+    },
+    "social": {
+      "status": "complete",
+      "startedAt": "2026-04-13T14:00:00.000Z",
+      "completedAt": "2026-04-13T14:30:00.000Z",
+      "agentId": "social-agent",
+      "modulesAnalyzed": [
+        "97860",
+        "3332",
+        "52850",
+        "81687",
+        "8083",
+        "13021",
+        "9439"
+      ],
+      "notesCreated": [
+        "social-multiplayer-socket.md",
+        "social-duel-invite-service.md",
+        "social-duel-invite-ui.md",
+        "social-social-menu.md",
+        "social-coop-titan.md",
+        "social-quickquiz-multiplayer.md"
+      ],
+      "serviceIdsFound": [
+        "16b-0e3b",
+        "b81-b032",
+        "336-324b",
+        "6ac-4dfc",
+        "3e5-dac1",
+        "35d-3bd9",
+        "fa8-1c91",
+        "824-bd4f",
+        "749-61df",
+        "ab9-3b05"
+      ],
+      "checkpoint": null,
+      "lastUpdated": "2026-04-13T14:30:00.000Z"
+    },
+    "membership": {
+      "status": "complete",
+      "startedAt": "2026-04-13T05:00:00.000Z",
+      "completedAt": "2026-04-13T05:45:00.000Z",
+      "agentId": "membership-agent",
+      "modulesAnalyzed": [
+        "63352",
+        "66582",
+        "63011",
+        "80003",
+        "96535",
+        "1195",
+        "91620",
+        "12270",
+        "60228",
+        "48417"
+      ],
+      "notesCreated": [
+        "membership-service.md"
+      ],
+      "serviceIdsFound": [
+        "859-25be",
+        "966-0d7c",
+        "de1-d8e8"
+      ],
+      "checkpoint": null
+    },
+    "reconciliation": {
+      "status": "complete",
+      "startedAt": "2026-04-13T18:00:00.000Z",
+      "completedAt": "2026-04-13T18:30:00.000Z",
+      "agentId": "reconciliation-agent",
+      "modulesAnalyzed": [],
+      "notesCreated": [
+        "reconciliation-report.md"
+      ],
+      "serviceIdsFound": [
+        "de1-d8e8"
+      ],
+      "checkpoint": null,
+      "lastUpdated": "2026-04-13T18:30:00.000Z"
+    }
+  }
+}

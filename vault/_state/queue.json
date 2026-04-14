@@ -1,0 +1,22 @@
+{
+  "version": "2026.18.1",
+  "queue": [
+    { "domain": "core-bootstrap", "priority": 1, "assignedTo": null, "depends": [] },
+    { "domain": "player", "priority": 2, "assignedTo": null, "depends": ["core-bootstrap"] },
+    { "domain": "network", "priority": 3, "assignedTo": null, "depends": ["core-bootstrap"] },
+    { "domain": "battle", "priority": 4, "assignedTo": null, "depends": ["player"] },
+    { "domain": "pets", "priority": 5, "assignedTo": null, "depends": ["player"] },
+    { "domain": "inventory", "priority": 6, "assignedTo": null, "depends": ["player"] },
+    { "domain": "quests", "priority": 7, "assignedTo": null, "depends": ["player"] },
+    { "domain": "zones", "priority": 8, "assignedTo": null, "depends": ["core-bootstrap"] },
+    { "domain": "ui-framework", "priority": 9, "assignedTo": null, "depends": ["core-bootstrap"] },
+    { "domain": "data-models", "priority": 10, "assignedTo": null, "depends": ["core-bootstrap"] },
+    { "domain": "economy", "priority": 11, "assignedTo": null, "depends": ["player", "inventory"] },
+    { "domain": "education", "priority": 12, "assignedTo": null, "depends": ["player"] },
+    { "domain": "festivals", "priority": 13, "assignedTo": null, "depends": ["player", "quests"] },
+    { "domain": "dungeons", "priority": 14, "assignedTo": null, "depends": ["battle", "zones"] },
+    { "domain": "social", "priority": 15, "assignedTo": null, "depends": ["network", "player"] },
+    { "domain": "membership", "priority": 16, "assignedTo": null, "depends": ["player"] },
+    { "domain": "reconciliation", "priority": 99, "assignedTo": null, "depends": ["ALL"] }
+  ]
+}
