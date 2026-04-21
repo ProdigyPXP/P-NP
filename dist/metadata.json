@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-04-21T19:12:37.652Z",
+  "generatedAt": "2026-04-21T20:53:25.344Z",
   "patcherVersion": "4.2.0",
-  "gameVersion": "2026.21.0",
+  "gameVersion": "2026.21.1",
   "publicGameHash": null,
   "loadGamePath": "/js/load-game-68aa19b558.min.js",
   "patchDegraded": false,
   "source": {
-    "gameUrl": "https://code.prodigygame.com/code/2026.21.0/game.min.js?v=2026.21.0",
+    "gameUrl": "https://code.prodigygame.com/code/2026.21.1/game.min.js?v=2026.21.1",
     "publicGameUrl": null,
     "loadGameUrl": "https://code.prodigygame.com/js/load-game-68aa19b558.min.js",
     "loadUrl": "https://math.prodigygame.com/load"
