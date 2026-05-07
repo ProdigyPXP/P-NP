@@ -4,7 +4,9 @@
 
 P-NP is a static patch pipeline for Prodigy Math Game. It runs as a GitHub Action every 2 hours, fetches the latest Prodigy game files, applies patches (hack injection points, auto-answer, lodash preservation, membership bypass), and commits the patched files to `dist/` on master.
 
-The Prodigy Origin extension (in ProdigyPXP/ProdigyOrigin) fetches the patched `game.min.js` from this repo's `dist/` directory on master.
+The Play Origin extension (in `ProdigyPXP/ProdigyOrigin`, formerly "Prodigy Origin") fetches the patched `game.min.js` from this repo's `dist/` directory on master.
+
+> **Naming:** This project was renamed from "Prodigy Origin" to "Play Origin" on 2026-05-06. The repo name `P-NP`, all `window.__PNP__*` globals, and the `%cP-NP Patcher` DevTools banner stay — they're tied to the repo identity. Only the `[P-NP]` log prefix was rebranded to `[Play Origin]`. See `ProdigyOrigin/meta/REBRAND.md` for full scope.
 
 ### Architecture
 

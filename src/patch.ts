@@ -211,13 +211,13 @@ window.__pnp_discoverService = function(gc, shapeFn, label) {
       try {
         var inst = gc.get(id);
         if (inst && shapeFn(inst)) {
-          console.log("[P-NP] Discovered " + label + " \\u2192 " + id);
+          console.log("[Play Origin] Discovered " + label + " \\u2192 " + id);
           return inst;
         }
       } catch(e) {}
     }
   } catch(e) {
-    console.warn("[P-NP] Discovery failed for " + label + ":", e);
+    console.warn("[Play Origin] Discovery failed for " + label + ":", e);
   }
   return null;
 };
@@ -226,7 +226,7 @@ if (typeof SW !== 'undefined' && SW.Load && typeof SW.Load.decrementLoadSemaphor
   var _pnpOrigDecrement = SW.Load.decrementLoadSemaphore.bind(SW.Load);
   SW.Load.decrementLoadSemaphore = function() {
     if (window.__PNP_SEM_DECREMENTED__) {
-      console.warn("[P-NP] SW.Load.decrementLoadSemaphore() called twice — blocking duplicate createGame()");
+      console.warn("[Play Origin] SW.Load.decrementLoadSemaphore() called twice — blocking duplicate createGame()");
       return;
     }
     window.__PNP_SEM_DECREMENTED__ = true;
@@ -368,7 +368,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
         } else {
           g?.state?.callbackContext?.runAwayCallback();
         }
-      } catch(e) { console.warn("[P-NP] escapeBattle failed:", e); }
+      } catch(e) { console.warn("[Play Origin] escapeBattle failed:", e); }
     };
 
     /* _.membership → discovered by shape (isMember getter + hasFeatureAccess).
@@ -428,7 +428,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
 
     if (!W.__PNP_PROPS_APPLIED__) {
       W.__PNP_PROPS_APPLIED__ = true;
-      console.log("[P-NP] Properties applied to window._");
+      console.log("[Play Origin] Properties applied to window._");
     }
   }
 
@@ -454,7 +454,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
           var ctor = Object.getPrototypeOf(window.__PNP__).constructor;
           if (ctor._instance && ctor._instance !== window.__PNP__ && ctor._instance.prodigy) {
             window.__PNP__ = ctor._instance;
-            console.log("[P-NP] Singleton auto-fixed to real instance (prodigy available)");
+            console.log("[Play Origin] Singleton auto-fixed to real instance (prodigy available)");
           }
         } catch(e) {}
       }
@@ -475,7 +475,7 @@ setTimeout(() =>
     try {
       eval(await (await fetch("${GUI_LINK}")).text());
     } catch(e) {
-      console.error("[P-NP] CheatGUI load failed:", e);
+      console.error("[Play Origin] CheatGUI load failed:", e);
     }
   })(), 15000);
 console.trace = () => {};

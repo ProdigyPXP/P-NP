@@ -1,6 +1,6 @@
 # P-NP
 
-P-NP is a static patch pipeline for Prodigy game files maintained by ProdigyPXP.
+P-NP is the static patch pipeline that powers **Play Origin** (the browser-extension mod loader, formerly "Prodigy Origin"). It's maintained by ProdigyPXP. The repo name `P-NP` is kept as-is — the rebrand is to the extension/loader, not this patcher.
 
 The repository no longer runs an HTTP server. Instead, a GitHub Action fetches current Prodigy assets, applies the patcher logic, and pushes the patched files to a dedicated `patched` branch so they can be served from `raw.githubusercontent.com`.
 
