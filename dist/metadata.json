@@ -1,10 +1,19 @@
 {
-  "generatedAt": "2026-05-24T07:20:22.511Z",
+  "generatedAt": "2026-05-24T09:04:05.416Z",
   "patcherVersion": "4.3.0",
   "gameVersion": "2026.25.0",
   "publicGameHash": null,
   "loadGamePath": "/js/load-game-f2baaaba58.min.js",
   "patchDegraded": false,
+  "manifestHash": "4509448a4c39c84d",
+  "perRuleCounts": {
+    "singleton-exposure": 1,
+    "safe-bind": 9,
+    "expose-constants": 1,
+    "answer-question-bypass": 1,
+    "external-factory-bypass": 1,
+    "open-question-bypass": 1
+  },
   "source": {
     "gameUrl": "https://code.prodigygame.com/code/2026.25.0/game.min.js?v=2026.25.0",
     "publicGameUrl": null,
