@@ -1,4 +1,4 @@
-import { describe, it } from "node:test";
+import { describe, it, test } from "node:test";
 import assert from "node:assert/strict";
 import { buildPrefix, buildSuffix } from "../src/wrappers.ts";
 
@@ -40,51 +40,59 @@ describe("buildPrefix", () => {
 
 describe("buildSuffix", () => {
   it("returns a string", () => {
-    assert.equal(typeof buildSuffix("4.4.0", "https://example.com/bundle.js", ["https://img/1.png"]), "string");
+    assert.equal(typeof buildSuffix("4.4.0", ["https://img/1.png"]), "string");
   });
 
   it("interpolates the version into the patcher header", () => {
-    const out = buildSuffix("4.4.0", "https://example.com/bundle.js", []);
+    const out = buildSuffix("4.4.0", []);
     assert.ok(out.includes("P-NP Patcher v4.4.0 — Suffix"));
   });
 
-  it("interpolates the GUI link verbatim into the loader fetch", () => {
-    const guiLink = "https://raw.githubusercontent.com/foo/bar/main/dist/bundle.js";
-    const out = buildSuffix("4.4.0", guiLink, []);
-    assert.ok(out.includes(guiLink));
-  });
-
   it("serializes displayImages as a JSON array literal in console.image", () => {
-    const out = buildSuffix("4.4.0", "https://x/y.js", ["https://a/1.png", "https://b/2.png"]);
+    const out = buildSuffix("4.4.0", ["https://a/1.png", "https://b/2.png"]);
     assert.ok(out.includes(JSON.stringify(["https://a/1.png", "https://b/2.png"])));
   });
 
   it("calls SW.Load.decrementLoadSemaphore at the top", () => {
-    const out = buildSuffix("4.4.0", "https://x/y.js", []);
+    const out = buildSuffix("4.4.0", []);
     assert.ok(out.includes("SW.Load.decrementLoadSemaphore()"));
   });
 
   it("schedules the CheatGUI loader via setTimeout(15000)", () => {
-    const out = buildSuffix("4.4.0", "https://x/y.js", []);
+    const out = buildSuffix("4.4.0", []);
     assert.ok(/setTimeout\b/.test(out));
     assert.ok(/,\s*15000\)/.test(out));
   });
 
   it("polls every 500ms to re-apply window._ properties", () => {
-    const out = buildSuffix("4.4.0", "https://x/y.js", []);
+    const out = buildSuffix("4.4.0", []);
     assert.ok(/setInterval\b/.test(out));
     assert.ok(/,\s*500\)/.test(out));
   });
 
   it("exposes _.player via discovery", () => {
-    const out = buildSuffix("4.4.0", "https://x/y.js", []);
+    const out = buildSuffix("4.4.0", []);
     assert.ok(out.includes("PlayerService"));
     assert.ok(out.includes("_.player") || out.includes('"player"'));
   });
 
   it("exposes _.membership via discovery + setMembership helper", () => {
-    const out = buildSuffix("4.4.0", "https://x/y.js", []);
+    const out = buildSuffix("4.4.0", []);
     assert.ok(out.includes("MembershipService"));
     assert.ok(out.includes("setMembership"));
+  });
+
+  test("buildSuffix references window.__ORIGIN_MENU_URL__ instead of baking a URL", () => {
+    const suffix = buildSuffix("4.4.1", ["https://example.com/img.png"]);
+    assert.match(suffix, /window\.__ORIGIN_MENU_URL__/);
+    assert.doesNotMatch(suffix, /raw\.githubusercontent\.com\/ProdigyPXP\/ProdigyOrigin/);
+    assert.doesNotMatch(suffix, /https?:\/\/[^"]*bundle\.js/);
+  });
+
+  test("buildSuffix interpolates version and displayImages", () => {
+    const suffix = buildSuffix("9.9.9", ["https://example.com/a.png", "https://example.com/b.png"]);
+    assert.match(suffix, /Version 9\.9\.9/);
+    assert.match(suffix, /https:\/\/example\.com\/a\.png/);
+    assert.match(suffix, /https:\/\/example\.com\/b\.png/);
   });
 });
