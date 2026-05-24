@@ -54,7 +54,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          git add dist/game.min.js dist/metadata.json
+          git add dist/manifest.json dist/game.min.js dist/metadata.json
           git add dist/public-game.min.js 2>/dev/null || true
 
           if git diff --cached --quiet; then
