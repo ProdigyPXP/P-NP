@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-24T09:04:05.416Z",
-  "patcherVersion": "4.3.0",
+  "generatedAt": "2026-05-24T19:13:33.212Z",
+  "patcherVersion": "4.4.0",
   "gameVersion": "2026.25.0",
   "publicGameHash": null,
   "loadGamePath": "/js/load-game-f2baaaba58.min.js",
   "patchDegraded": false,
-  "manifestHash": "4509448a4c39c84d",
+  "manifestHash": "9af20f1557abfe88",
   "perRuleCounts": {
     "singleton-exposure": 1,
     "safe-bind": 9,
