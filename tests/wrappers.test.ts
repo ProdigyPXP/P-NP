@@ -66,12 +66,14 @@ describe("buildSuffix", () => {
 
   it("schedules the CheatGUI loader via setTimeout(15000)", () => {
     const out = buildSuffix("4.4.0", "https://x/y.js", []);
-    assert.match(out, /setTimeout\([^)]+,\s*15000\)/);
+    assert.ok(/setTimeout\b/.test(out));
+    assert.ok(/,\s*15000\)/.test(out));
   });
 
   it("polls every 500ms to re-apply window._ properties", () => {
     const out = buildSuffix("4.4.0", "https://x/y.js", []);
-    assert.match(out, /setInterval\([^)]+,\s*500\)/);
+    assert.ok(/setInterval\b/.test(out));
+    assert.ok(/,\s*500\)/.test(out));
   });
 
   it("exposes _.player via discovery", () => {

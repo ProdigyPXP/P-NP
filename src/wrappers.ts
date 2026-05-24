@@ -297,7 +297,7 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
      missing. The 500ms interval is negligible overhead. */
   _applyProps();
 
-  var _pnpPollTick = function() {
+  setInterval(() => {
     try {
       const desc = Object.getOwnPropertyDescriptor(window._, 'instance');
       if (!desc || !desc.get || !window.__PNP__) {
@@ -324,19 +324,18 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
         try { void window._.network; } catch(e) {}
       }
     } catch(e) { _applyProps(); }
-  };
-  setInterval(_pnpPollTick, 500);
+  }, 500);
 })();
 
 /* ── 3. CheatGUI loader (delayed to ensure game is ready) ── */
-var _pnpLoadGUI = async () => {
-  try {
-    eval(await (await fetch("${guiLink}")).text());
-  } catch(e) {
-    console.error("[Play Origin] CheatGUI load failed:", e);
-  }
-};
-setTimeout(_pnpLoadGUI, 15000);
+setTimeout(() =>
+  (async () => {
+    try {
+      eval(await (await fetch("${guiLink}")).text());
+    } catch(e) {
+      console.error("[Play Origin] CheatGUI load failed:", e);
+    }
+  })(), 15000);
 console.trace = () => {};
 `;
 };
