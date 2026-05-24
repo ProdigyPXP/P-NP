@@ -91,9 +91,10 @@ export const runPatch = async (outputDir = "patched-output"): Promise<PatchResul
     throw new Error("Fetched public-game.min.js does not appear to be valid JavaScript.");
   }
 
-  // Build prefix/suffix with current VERSION/GUI_LINK/displayImages baked in.
+  // Build prefix/suffix with current VERSION/displayImages baked in.
+  // GUI_LINK is exported as manifest.defaultMenuUrl (extension applies it).
   const prefix = buildPrefix(VERSION);
-  const suffix = buildSuffix(VERSION, GUI_LINK, displayImages);
+  const suffix = buildSuffix(VERSION, displayImages);
 
   // VERIFY rules apply cleanly to the live bundle. Set patchDegraded if not.
   console.log(`[patcher] verifying ${RULES.length} rule(s) against live bundle`);
@@ -115,7 +116,13 @@ export const runPatch = async (outputDir = "patched-output"): Promise<PatchResul
   }
 
   // Build manifest + verification bundle.
-  const manifest = buildManifest({ patcherVersion: VERSION, rules: RULES, prefix, suffix });
+  const manifest = buildManifest({
+    patcherVersion: VERSION,
+    rules: RULES,
+    prefix,
+    suffix,
+    defaultMenuUrl: GUI_LINK
+  });
   const verificationBundle = `${prefix}\n${patchedCore}\n${suffix}`;
   const patchedPublicGame = publicGameSource ? patchPublicGameFile(publicGameSource) : null;
 
