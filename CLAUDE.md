@@ -10,7 +10,10 @@ The Play Origin extension (in `ProdigyPXP/ProdigyOrigin`, formerly "Prodigy Orig
 
 ### Architecture
 
-- **src/patch.ts** — Core patcher. Fetches game files, applies regex-based patches, writes output.
+- **src/patch.ts** — Orchestrator. Fetches game files, runs rules via `src/patches.ts` for VERIFICATION, builds the prefix/suffix via `src/wrappers.ts`, assembles `dist/manifest.json` (primary artifact) + `dist/game.min.js` (verification copy) + `dist/metadata.json`.
+- **src/patches.ts** — `PatchRule` type, `RULES` array, `applyRules`, `hashRules`.
+- **src/wrappers.ts** — `buildPrefix(version)`, `buildSuffix(version, displayImages)`; `buildSuffix` reads `window.__ORIGIN_MENU_URL__`, which is provided via `manifest.defaultMenuUrl`.
+- **src/manifest.ts** — `Manifest` type, `buildManifest`, `hashManifest`.
 - **src/constants.ts** — URLs, version, GUI link.
 - **src/displayImages.ts** — Console splash images.
 - **build.mjs** — esbuild build script.
@@ -45,6 +48,7 @@ node dist/patch.js  # Run patcher locally
 ## Output
 
 The patcher writes to the output directory:
-- `game.min.js` — Patched game with injected hack entry points
-- `metadata.json` — Build metadata (version, hash, degraded status)
-- `public-game.min.js` — Patched public game file (if available)
+- `manifest.json` — **Primary artifact.** Consumed by the Play Origin extension.
+- `game.min.js` — Verification copy of the patched bundle (not loaded by the extension at runtime).
+- `metadata.json` — Per-run metadata: version, hash, perRuleCounts, degraded status.
+- `public-game.min.js` — Patched public game file (if available).
