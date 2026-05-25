@@ -8,10 +8,13 @@ The repository no longer runs an HTTP server. Instead, a GitHub Action fetches c
 
 The patcher's primary artifact is `dist/manifest.json` — a small JSON file containing:
 
+- `schemaVersion` — manifest schema version for compatibility checks.
+- `patcherVersion` — version of this patcher that produced the manifest.
 - `rules` — ordered list of regex find/replace rules applied to `game.min.js`.
 - `prefix` — pre-rendered JS string prepended to the patched game.
 - `suffix` — pre-rendered JS string appended after the patched game.
-- `hash` — content hash of `{rules, prefix, suffix}` for cache invalidation.
+- `defaultMenuUrl` — default menu/loader URL used by consumers when patching.
+- `hash` — content hash of `{rules, prefix, suffix, defaultMenuUrl}` for cache invalidation.
 
 The Play Origin extension fetches this manifest, fetches the original `game.min.js`
 from `code.prodigygame.com`, applies the rules locally in its background service
