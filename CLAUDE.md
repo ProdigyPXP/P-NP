@@ -12,7 +12,7 @@ The Play Origin extension (in `ProdigyPXP/ProdigyOrigin`, formerly "Prodigy Orig
 
 - **src/patch.ts** — Orchestrator. Fetches game files, runs rules via `src/patches.ts` for VERIFICATION, builds the prefix/suffix via `src/wrappers.ts`, assembles `dist/manifest.json` (primary artifact) + `dist/game.min.js` (verification copy) + `dist/metadata.json`.
 - **src/patches.ts** — `PatchRule` type, `RULES` array, `applyRules`, `hashRules`.
-- **src/wrappers.ts** — `buildPrefix(version)`, `buildSuffix(version, guiLink, displayImages)`.
+- **src/wrappers.ts** — `buildPrefix(version)`, `buildSuffix(version, displayImages)`; `buildSuffix` reads `window.__ORIGIN_MENU_URL__`, which is provided via `manifest.defaultMenuUrl`.
 - **src/manifest.ts** — `Manifest` type, `buildManifest`, `hashManifest`.
 - **src/constants.ts** — URLs, version, GUI link.
 - **src/displayImages.ts** — Console splash images.
