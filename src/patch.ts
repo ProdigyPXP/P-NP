@@ -92,9 +92,11 @@ export const runPatch = async (outputDir = "patched-output"): Promise<PatchResul
   }
 
   // Build prefix/suffix with current VERSION/displayImages baked in.
-  // GUI_LINK is exported as manifest.defaultMenuUrl (extension applies it).
+  // GUI_LINK is exported as manifest.defaultMenuUrl (extension applies it)
+  // AND baked into the suffix as a runtime fallback for extension builds
+  // that don't set window.__ORIGIN_MENU_URL__.
   const prefix = buildPrefix(VERSION);
-  const suffix = buildSuffix(VERSION, displayImages);
+  const suffix = buildSuffix(VERSION, GUI_LINK, displayImages);
 
   // VERIFY rules apply cleanly to the live bundle. Set patchDegraded if not.
   console.log(`[patcher] verifying ${RULES.length} rule(s) against live bundle`);

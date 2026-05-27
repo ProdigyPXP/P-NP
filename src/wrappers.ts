@@ -91,6 +91,7 @@ if (typeof SW !== 'undefined' && SW.Load && typeof SW.Load.decrementLoadSemaphor
 
 export const buildSuffix = (
   version: string,
+  defaultMenuUrl: string,
   displayImages: ReadonlyArray<string>
 ): string => {
   return `
@@ -328,14 +329,16 @@ console.image((e => e[Math.floor(Math.random() * e.length)])(${JSON.stringify(di
 
 /* ── 3. CheatGUI loader (delayed to ensure game is ready) ──
  * URL is supplied by the extension via window.__ORIGIN_MENU_URL__.
- * The extension resolves: popup override → manifest.defaultMenuUrl. */
+ * The extension resolves: popup override → manifest.defaultMenuUrl.
+ * Falls back to the baked-in default if the extension didn't set one
+ * (e.g. older extension builds that predate __ORIGIN_MENU_URL__). */
 setTimeout(() =>
   (async () => {
     try {
       var url = window.__ORIGIN_MENU_URL__;
       if (typeof url !== "string" || url.length === 0) {
-        console.warn("[Play Origin] No menu URL set (window.__ORIGIN_MENU_URL__ missing). Mod bundle skipped.");
-        return;
+        url = ${JSON.stringify(defaultMenuUrl)};
+        console.warn("[Play Origin] window.__ORIGIN_MENU_URL__ missing; falling back to default menu URL: " + url);
       }
       eval(await (await fetch(url)).text());
     } catch(e) {
