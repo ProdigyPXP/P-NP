@@ -1,13 +1,15 @@
 name: Patch Prodigy Files
 
 on:
-  schedule:
-    - cron: "0 */2 * * *"
+  # Cron disabled: runtime patching moved client-side. The Play Origin extension
+  # now patches the bundle in-browser from the user's residential connection, so
+  # the server-side run is no longer needed for runtime — and it was 403-blocked
+  # on GitHub's Azure IPs anyway. Kept as manual-only to regenerate
+  # dist/manifest.json after editing patch rules. See CLAUDE.md.
   workflow_dispatch:
 
 permissions:
   contents: write
-  issues: write
 
 concurrency:
   group: patch-workflow
@@ -67,16 +69,3 @@ jobs:
           git commit -m "chore: update patched game files"
           git pull --rebase origin master
           git push origin master
-
-      - name: Create issue on failure
-        if: failure()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh issue create \
-            --title "Patch workflow failed" \
-            --body "The patch workflow failed on $(date -u +'%Y-%m-%d %H:%M:%S UTC').
-
-          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-          Please investigate the logs for more details."
