@@ -20,7 +20,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: latest
+          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -32,7 +32,12 @@ jobs:
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Update root dependencies
-        run: pnpm update --latest --ignore-scripts
+        # No --latest: stay within the semver ranges declared in package.json
+        # (caret ranges) so this unattended, directly-pushed-to-master job can
+        # never silently cross a major version (e.g. the typescript v6->v7
+        # jump that landed with no PR/CI gate). Major bumps should go through
+        # Dependabot's PR flow, which is gated by Build Check + Dependency Review.
+        run: pnpm update --ignore-scripts
 
       - name: Commit changes
         run: |
