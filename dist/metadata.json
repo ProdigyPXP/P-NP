@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-17T22:00:02.273Z",
+  "generatedAt": "2026-08-07T21:49:56.543Z",
   "patcherVersion": "4.4.1",
-  "gameVersion": "2026.30.0",
+  "gameVersion": "2026.37.0",
   "publicGameHash": null,
-  "loadGamePath": "/js/load-game-f2baaaba58.min.js",
+  "loadGamePath": "/js/load-game-d0aabc9af3.min.js",
   "patchDegraded": false,
   "manifestHash": "20c9e9be02bab3d9",
   "perRuleCounts": {
@@ -15,9 +15,9 @@
     "open-question-bypass": 1
   },
   "source": {
-    "gameUrl": "https://code.prodigygame.com/code/2026.30.0/game.min.js?v=2026.30.0",
+    "gameUrl": "https://code.prodigygame.com/code/2026.37.0/game.min.js?v=2026.37.0",
     "publicGameUrl": null,
-    "loadGameUrl": "https://code.prodigygame.com/js/load-game-f2baaaba58.min.js",
+    "loadGameUrl": "https://code.prodigygame.com/js/load-game-d0aabc9af3.min.js",
     "loadUrl": "https://math.prodigygame.com/load"
   }
 }
